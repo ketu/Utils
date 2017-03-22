@@ -1,1 +1,1 @@
-# Simple client for eBay api 
+# Common PHP utils class
