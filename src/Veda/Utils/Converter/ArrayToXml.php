@@ -12,9 +12,12 @@ use DOMException;
 
 final class ArrayToXml
 {
+
+    private $document;
+
     private function __construct(array $arrayData, $rootElementName = null)
     {
-        $this->document = new DOMDocument();
+        $this->document = new \DOMDocument();
         $this->document->appendChild($this->document->createElement($rootElementName == null ? 'root' : $rootElementName));
     }
 
