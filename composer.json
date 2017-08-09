@@ -12,7 +12,8 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.0",
-        "psr/http-message": "^1.0"
+        "psr/http-message": "^1.0",
+        "veda/utils": "dev-master"
     },
     "autoload": {
         "psr-4": {
