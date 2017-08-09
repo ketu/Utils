@@ -44,6 +44,7 @@ class XmlToArray
         switch ($element->nodeType) {
 
             case XML_ELEMENT_NODE:
+                var_dump($element->hasChildNode);
                 for ( $i = 0, $m = $element->childNodes->length;$i < $m;$i ++ ) {
                     echo $i;
                     $child = $element->childNodes->item($i);
