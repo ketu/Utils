@@ -17,61 +17,82 @@ class XmlToArray
 
     private $document;
 
-    private function __construct(string $xml)
+    private function __construct($xml, $version, $encoding)
     {
-        $this->document = new \DOMDocument();
+        $this->document = new DOMDocument($version, $encoding);
         $this->document->loadXML($xml);
     }
-
 
     private function getRootElement()
     {
         return $this->document->documentElement;
     }
 
-    public static function convert(string $xml)
+
+    public static function convert($xml, $version = "1.0", $encoding = "UTF-8")
     {
-        $reader = new static($xml);
-        return $reader->convertElement($reader->getRootElement());
-
-
+        $dom = new static($xml, $version, $encoding);
+        return [$dom->getRootElement()->tagName => $dom->convertElement($dom->getRootElement())];
     }
 
-    private function convertElement($element)
+
+    /**
+     * see @http://www.lalit.org/wordpress/wp-content/uploads/2011/07/XML2Array.html?ver=0.2
+     * @param mixed $node
+     */
+    private function convertElement($node)
     {
-        $arrayData = [];
-
-        switch ($element->nodeType) {
-
-            case XML_ELEMENT_NODE:
-                var_dump($element->hasChildNode);
-                for ( $i = 0, $m = $element->childNodes->length;$i < $m;$i ++ ) {
-                    echo $i;
-                    $child = $element->childNodes->item($i);
-                    echo $child->tagName;
-                }
-
-                    $arrayData[$element->tagName] = $element->nodeValue;
-
-                break;
+        $output = [];
+        switch ($node->nodeType) {
             case XML_TEXT_NODE:
-
-                $arrayData[$element->tagName] = $element->nodeValue;
-
-
+                $output = trim($node->nodeValue);
                 break;
-
-            default:
-                $arrayData['dd'] = 'dfs';
+            case XML_ELEMENT_NODE:
+                if ($node->hasChildNodes()) {
+                    foreach ($node->childNodes as $childNode) {
+                        $v = $this->convertElement($childNode);
+                        if (isset($childNode->tagName)) {
+                            $tagName = $childNode->tagName;
+                            if (stripos($tagName, ":") !== false) {
+                                list($ns, $tagName) = \explode(":", $tagName);
+                            }
+                            if (!isset($output[$tagName])) {
+                                $output[$tagName] = [];
+                            }
+                            $output[$tagName][] = $v;
+                        } else {
+                            if ($v !== "") {
+                                $output = $v;
+                            }
+                        }
+                    }
+                    if (is_array($output)) {
+                        // if only one node of its kind, assign it directly instead if array($value);
+                        foreach ($output as $t => $v) {
+                            if (is_array($v) && count($v) == 1) {
+                                $output[$t] = $v[0];
+                            }
+                        }
+                        if (empty($output)) {
+                            $output = '';
+                        }
+                    }
+                } else {
+                    $output = trim($node->nodeValue);
+                }
                 break;
         }
+        return $output;
 
-
-        return $arrayData;
     }
 
     public static function fromFile($filename)
     {
+
+        if (file_exists($filename)) {
+            $xml = file_get_contents($filename);
+            return self::convert($xml);
+        }
 
     }
 }

@@ -1,23 +1,18 @@
 <?php
 /**
+<<<<<<< HEAD
  * User: ketu.lai <ketu.lai@gmail.com>
  * Date: 17-8-8
+=======
+ * Date: 2017/8/9 9:14
+>>>>>>> 6bc5ab7baf21340babb4c44dc85347a1a9197378
  */
 
 
 require "../vendor/autoload.php";
 
-$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<ListMatchingProductsResponse xmlns=\"http://mws.amazonservices.com/schema/Products/2011-10-01\">
-   <ListMatchingProductsResult>
-        <Products>
-            <Product>
-                <Name>Google</Name>
-            </Product>
-        </Products>
-    </ListMatchingProductsResult>
-</ListMatchingProductsResponse>
-";
 
-$arr = \Veda\Utils\Converter\XmlToArray::convert($xml);
-var_dump($arr);
+$xml = \Veda\Utils\Converter\XmlToArray::fromFile('xml.xml');
+
+var_dump($xml);
+
